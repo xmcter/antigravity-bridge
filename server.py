@@ -2469,11 +2469,14 @@ def main() -> None:
             print(f"[bridge] WARN account {a.label}: {e}", flush=True)
 
     print(f"[bridge] listening  : http://{args.host}:{args.port}", flush=True)
-    try:
-        models = fetch_available_models()
-        print(f"[bridge] models     : {len(models)} available", flush=True)
-    except Exception as e:
-        print(f"[bridge] models     : static fallback ({e})", flush=True)
+    # Do not block startup on upstream model discovery (TLS/proxy can hang).
+    def _warm_models():
+        try:
+            models = fetch_available_models()
+            print(f"[bridge] models     : {len(models)} available", flush=True)
+        except Exception as e:
+            print(f"[bridge] models     : static fallback ({e})", flush=True)
+    threading.Thread(target=_warm_models, daemon=True).start()
     app.run(host=args.host, port=args.port, threaded=True, debug=False)
 
 

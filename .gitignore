@@ -45,9 +45,12 @@ nohup.out
 # Local credentials / secrets
 .env
 *.env
+.bridge_api_key
 antigravity-auth.json
 auth_cache/
 accounts.json
+accounts*.json
+*.bak*
 secrets/
 
 # Systemd / daemon files (local only)
